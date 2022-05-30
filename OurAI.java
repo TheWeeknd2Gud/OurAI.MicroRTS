@@ -553,8 +553,8 @@ public class OurAI extends AIWithComputationBudget {
     int combatScore(Unit u, Unit e) {
         int score = -distance(u, e);
         
-        if (u.getType() == _utt.getUnitType("Ranged") 
-                && e.getType() == _utt.getUnitType("Ranged") && _pgs.getWidth() > 9)
+        if (u.getType() == _utt.getUnitType("Light") 
+                && e.getType() == _utt.getUnitType("Lght") && _pgs.getWidth() > 9)
             score += 2; //todo may be change that and add logic below
         
         if (_pgs.getWidth() >= 16 && (u.getType() == _utt.getUnitType("Heavy") || u.getType() == _utt.getUnitType("Ranged"))
@@ -819,26 +819,26 @@ public class OurAI extends AIWithComputationBudget {
             return false;
         return true;
     }
-    void barracksAction() {
+    void barracksAction() {//Funcion Modificada, pruebas en progreso
         int totalHeavies = _heavies.size() + _futureHeavies;
         for (Unit barrack : _barracks) {
             if (busy(barrack))
                 continue;
             
             if(isSeperated(barrack, _enemies)) {
-                if(produceCombat(barrack, _utt.getUnitType("Ranged")))
+                if(produceCombat(barrack, _utt.getUnitType("Light")))
                     continue;
             }
             
-            if(produceCombat(barrack, _utt.getUnitType("Heavy")))
+            if(produceCombat(barrack, _utt.getUnitType("Light")))
                 continue;
             
-            if(enemyHeaviesWeak()) //not enough resource for heavy
-                if(produceCombat(barrack, _utt.getUnitType("Ranged")))
+            if(enemyHeaviesWeak()) 
+                if(produceCombat(barrack, _utt.getUnitType("Light")))
                     continue;
             
-            if (_resources.isEmpty() && _p.getResources() - _resourcesUsed < _utt.getUnitType("Heavy").cost)
-                produceCombat(barrack, _utt.getUnitType("Ranged"));
+            if (_resources.isEmpty() && _p.getResources() - _resourcesUsed < _utt.getUnitType("Light").cost)
+                produceCombat(barrack, _utt.getUnitType("Light"));
         }
     }
     
