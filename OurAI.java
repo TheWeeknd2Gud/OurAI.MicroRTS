@@ -1,5 +1,5 @@
 
-package OurAI;
+package ai.abstraction;
 
 import ai.abstraction.pathfinding.AStarPathFinding;
 import ai.core.AI;
@@ -500,7 +500,7 @@ public class OurAI extends AIWithComputationBudget {
         lockPos(u.getX(), u.getY(), ua.getDirection());
         if (bType == _utt.getUnitType("Barracks"))
             _futureBarracks.add(futurePos(u.getX(), u.getY(), ua.getDirection()));
-        else if (bType == _utt.getUnitType("Heavy"))
+        else if (bType == _utt.getUnitType("Light"))
             _futureHeavies += 1;
         _resourcesUsed += bType.cost;
         return true;
