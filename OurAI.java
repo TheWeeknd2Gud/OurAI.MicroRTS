@@ -42,7 +42,7 @@ public class OurAI extends AIWithComputationBudget {
     
     AStarPathFinding _astarPath;
     
-    int NoDirection = 100; //this is a hack
+    int NoDirection = 100;
     long _startCycleMilli;
     long _latestTsMilli;
     
@@ -57,7 +57,7 @@ public class OurAI extends AIWithComputationBudget {
     
     List<Long> _memHarvesters;
     
-    List<Integer> _locationsTaken; //x+y*width
+    List<Integer> _locationsTaken; 
     
     int _resourcesUsed;
     List<Pos> _futureBarracks;
@@ -136,7 +136,7 @@ public class OurAI extends AIWithComputationBudget {
             markNext.clear();
             markNext.addAll(queue);
         }
-        //now lets see if there is a path
+        
         List<Pos> moves = allPosDist(toPos(u), 1);
         Integer bestFit = Integer.MIN_VALUE;
         Pos bestPos = null;
@@ -179,7 +179,7 @@ public class OurAI extends AIWithComputationBudget {
     public OurAI(UnitTypeTable utt) {
         super(-1, -1);
         _utt = utt;
-        restartPathFind(); //FloodFillPathFinding(); //AStarPathFinding();
+        restartPathFind(); 
         _memHarvesters = new ArrayList<>();
                 
         _dirs = new ArrayList<>();
@@ -191,7 +191,7 @@ public class OurAI extends AIWithComputationBudget {
     @Override
     public void reset() {
         _memHarvesters = new ArrayList<>();
-        restartPathFind(); //FloodFillPathFinding();//BFSPathFinding();//AStarPathFinding();
+        restartPathFind(); 
     }
     @Override
     public AI clone() {
@@ -210,15 +210,14 @@ public class OurAI extends AIWithComputationBudget {
         ResourceUsage ru = _gs.getResourceUsage().clone();
         ru.merge(_pa.getResourceUsage());
         
-        //todo - on small board taking future pos as used may 
-        //be to harsh and costly
+
         for (Integer pos : _locationsTaken) {
             int x = pos % _pgs.getWidth();
             int y = pos / _pgs.getWidth();
             Unit u = new Unit(0, _utt.getUnitType("Worker"), x, y);
             UnitAction a = null;
             if (x > 0)
-                a = new UnitAction(UnitAction.TYPE_MOVE, NoDirection); //this is a hack
+                a = new UnitAction(UnitAction.TYPE_MOVE, NoDirection); 
             else
                 a = new UnitAction(UnitAction.TYPE_MOVE, NoDirection);
             UnitActionAssignment uaa = new UnitActionAssignment(u, a, 0);
@@ -292,7 +291,7 @@ public class OurAI extends AIWithComputationBudget {
         return new Pos(unit.getX(), unit.getY());
     }
     boolean isEnemyUnit(Unit u) {
-        return u.getPlayer() >= 0 && u.getPlayer() != _p.getID(); //can be neither ally ot foe
+        return u.getPlayer() >= 0 && u.getPlayer() != _p.getID(); 
     }
     boolean busy(Unit u) {
         if(_pa.getAction(u) != null)
@@ -345,14 +344,14 @@ public class OurAI extends AIWithComputationBudget {
     boolean isSeperated(Unit base, List<Unit> units) {
         for (Unit u : units) {
             int rasterPos = u.getX() + u.getY() * _pgs.getWidth();
-            ResourceUsage rsu = fullResourceUse();//(_pgs.getHeight() == 8) ? _gs.getResourceUsage() :  //todo - remove this
+            ResourceUsage rsu = fullResourceUse();
             if (_astarPath.findPathToAdjacentPosition(base, rasterPos, _gs, rsu) != null)
                     return false;
         }
         return true;
     }
     
-    //todo - fix this to real distance
+
     int distance(Pos a, Pos b) {
         if (a == null | b == null)
             return Integer.MAX_VALUE;
@@ -454,7 +453,7 @@ public class OurAI extends AIWithComputationBudget {
             Pos newPos = futurePos(a.getX(), a.getY(), dir);
             if (distance(newPos, toPos(b)) <= startDist)
                 continue;
-            if (!posFree(newPos.getX(), newPos.getY(), NoDirection)) //a hack
+            if (!posFree(newPos.getX(), newPos.getY(), NoDirection)) 
                 continue;
             UnitAction ua = new UnitAction(UnitAction.TYPE_MOVE, dir);
             if (_gs.isUnitActionAllowed(b, ua)) {
@@ -473,7 +472,7 @@ public class OurAI extends AIWithComputationBudget {
             Pos newPos = futurePos(a.getX(), a.getY(), dir);
             if (distance(newPos, toPos(b)) >= startDist)
                 continue;
-            if (!posFree(newPos.getX(), newPos.getY(), NoDirection)) //a hack
+            if (!posFree(newPos.getX(), newPos.getY(), NoDirection)) 
                 continue;
             UnitAction ua = new UnitAction(UnitAction.TYPE_MOVE, dir);
             if (_gs.isUnitActionAllowed(a, ua)) {
@@ -555,10 +554,10 @@ public class OurAI extends AIWithComputationBudget {
         
         if (u.getType() == _utt.getUnitType("Light") 
                 && e.getType() == _utt.getUnitType("Lght") && _pgs.getWidth() > 9)
-            score += 2; //todo may be change that and add logic below
+            score += 2; 
         
         if (_pgs.getWidth() >= 16 && (u.getType() == _utt.getUnitType("Heavy") || u.getType() == _utt.getUnitType("Ranged"))
-               && (e.getType() == _utt.getUnitType("Barracks"))) //todo - remove? todo base
+               && (e.getType() == _utt.getUnitType("Barracks"))) 
             score += _pgs.getWidth();
         
         return score;
@@ -582,9 +581,9 @@ public class OurAI extends AIWithComputationBudget {
             List<Unit> candidates = new ArrayList(_enemies);
             List<Unit> candidatesCopy = new ArrayList(candidates);
             int[] scores = getCombatScores(u, candidates);
-            Collections.sort(candidates, Comparator.comparing(e -> -scores[candidatesCopy.indexOf(e)])); //- for ascending order
+            Collections.sort(candidates, Comparator.comparing(e -> -scores[candidatesCopy.indexOf(e)])); 
             int counter = 0;
-            int cutOff = _enemiesCombat.size() > 24 ? 12 : 24; //for performance
+            int cutOff = _enemiesCombat.size() > 24 ? 12 : 24; 
             long timeRemain = timeRemaining(true);
             
             while(counter < candidates.size() && counter < cutOff && timeRemain > timeToSave) {
@@ -593,12 +592,12 @@ public class OurAI extends AIWithComputationBudget {
                     break;
                 counter++;
             }
-            if (counter < candidates.size()) //if (!candidates.isEmpty()) //did we make a move
+            if (counter < candidates.size()) 
                 continue;
             if (u.getType() != _utt.getUnitType("Ranged"))
                 continue;
             Unit enemy = candidates.get(0);
-            if (overPowering()) //give worker to open pathway if blocked
+            if (overPowering()) 
                 tryMoveAway(u, u);
             moveInDirection(u, enemy);
         }
@@ -610,7 +609,7 @@ public class OurAI extends AIWithComputationBudget {
         if (enemyHeaviesWeak() && _enemyArchers.isEmpty() &&
                  _heavies.isEmpty() && _futureHeavies == 0 && _archers.isEmpty())
             return true;
-        return false; //todo here
+        return false; 
     }
     
     int harvestScore(Unit worker, List<Unit> basesRemain) {
@@ -628,12 +627,12 @@ public class OurAI extends AIWithComputationBudget {
             return false;
         int dist = distance(toPos(worker), toPos(closestRes));
         if (dist == 1) {
-            harvest(worker, closestRes); //todo - safe to harvest
+            harvest(worker, closestRes); 
             return true;
         }
 
         if (!moveTowards(worker, toPos(closestRes)))
-            tryMoveAway(worker, worker); //random move to shake things up
+            tryMoveAway(worker, worker); 
         return true;
     }
     
@@ -647,7 +646,7 @@ public class OurAI extends AIWithComputationBudget {
 
         int totalOcc = totalWorkers + totalCombat + baseTotal + barracks + totalResource;
         if(_pgs.getWidth() <= 12 && totalOcc > (int) (area / 2.9))
-            return 1; //be more aggresive
+            return 1; 
         return 2;
     }
     
@@ -677,7 +676,7 @@ public class OurAI extends AIWithComputationBudget {
             }
         }
         
-        //find harvesters
+       
         while (!bs.isEmpty() && !ws.isEmpty()) {
             Unit w = ws.stream().min(Comparator.comparingInt((e) -> harvestScore(e, bs))).get();
             if (harvestScore(w, bs) == Integer.MAX_VALUE)
@@ -688,7 +687,7 @@ public class OurAI extends AIWithComputationBudget {
             ws.remove(w);
             if(baseHarCount.containsKey(b) == false)
                 baseHarCount.put(b, 1);
-            if(baseHarCount.getOrDefault(b, 0) >= perBase) //top 2 harvesters per base
+            if(baseHarCount.getOrDefault(b, 0) >= perBase) 
                 bs.remove(b);
         }
         
@@ -701,7 +700,7 @@ public class OurAI extends AIWithComputationBudget {
             if (base == null)
                 return;
             else if (distance(worker, base) <= 1)
-                returnHarvest(worker, base); //todo - check if safe?
+                returnHarvest(worker, base); 
             else
                 moveTowards(worker, toPos(base));
         }
@@ -722,13 +721,13 @@ public class OurAI extends AIWithComputationBudget {
                 continue;
             Unit e = closest(base, _enemies);
             Unit r = closest(base, _resources);
-            if (e == null) //already won?
+            if (e == null) 
                     continue;
-            //towards enemy, or 
-            if (r == null ||_workers.size() >= 2*_bases.size()) {// todo here *2?
-                score = -distance(n, toPos(e)); //close to enemy is better
+          
+            if (r == null ||_workers.size() >= 2*_bases.size()) {
+                score = -distance(n, toPos(e)); 
             } else
-                score = -distance(n, toPos(r)); //close to resource
+                score = -distance(n, toPos(r)); 
             if(score > bestScore) {
                 bestScore = score;
                 bestDir = dir;
@@ -738,7 +737,7 @@ public class OurAI extends AIWithComputationBudget {
     }
     
     int workerPerBase(Unit base) {
-        if (_pgs.getWidth() < 9)// && _barracks.isEmpty())
+        if (_pgs.getWidth() < 9)
             return 15;
         
         if (_pgs.getWidth() > 16)
@@ -749,8 +748,7 @@ public class OurAI extends AIWithComputationBudget {
         
         int enemyFromBelow = (_enemyWorkers.size()) / Math.max(_enemyBases.size(), 1);
         return Math.max(enemyFromBelow, 2);
-        //return  .size()
-        //return 4;
+       
     }
     
     void basesAction() {
@@ -760,12 +758,12 @@ public class OurAI extends AIWithComputationBudget {
             if(busy(base))
                 continue;
             int workerPerBase = workerPerBase(base);
-            boolean onlyOption = _resources.isEmpty() && ((_p.getResources() - _resourcesUsed) == 1); //todo some workers carry...
+            boolean onlyOption = _resources.isEmpty() && ((_p.getResources() - _resourcesUsed) == 1); 
             if(onlyOption) {
                 produceWherever(base, _utt.getUnitType("Worker"));
                 continue;
             }
-            // Dont produce if not in abundance
+            
             if (_pgs.getWidth()>= 9 &&  _workers.size() + producingWorker + producingCount >= workerPerBase * _bases.size())
                 continue;
             int dirBuild = bestBuildWorkerDir(base);
@@ -802,7 +800,7 @@ public class OurAI extends AIWithComputationBudget {
             return false;
 
         if (_enemyHeavies.size() == 1) {
-            if(_enemyHeavies.get(0).getHitPoints() > 3) //rangers get 3 shoots at heavy
+            if(_enemyHeavies.get(0).getHitPoints() > 3) 
                 return false;
         }
         
@@ -812,33 +810,33 @@ public class OurAI extends AIWithComputationBudget {
             int baseDist = minDistance(uPos, toPos(_enemyBases));
             int resDist =  u.getResources() > 0 ? 0 : minDistance(uPos, toPos(_resources));
             
-            //todo - here what matters is how close are we to attack relative to future heavies
+            
             totEnemyRes += (baseDist + resDist) < _pgs.getWidth()/2 ? 1 : 0;
         }
         if (totEnemyRes >= _utt.getUnitType("Heavy").cost)
             return false;
         return true;
     }
-    void barracksAction() {//Funcion Modificada, pruebas en progreso
+    void barracksAction() {//Funcion Modificada, se ha cambiado desde la prueba anterior, de usar unidades light a Ranged
         int totalHeavies = _heavies.size() + _futureHeavies;
         for (Unit barrack : _barracks) {
             if (busy(barrack))
                 continue;
             
             if(isSeperated(barrack, _enemies)) {
-                if(produceCombat(barrack, _utt.getUnitType("Light")))
+                if(produceCombat(barrack, _utt.getUnitType("Ranged")))
                     continue;
             }
             
-            if(produceCombat(barrack, _utt.getUnitType("Light")))
+            if(produceCombat(barrack, _utt.getUnitType("Ranged")))
                 continue;
             
             if(enemyHeaviesWeak()) 
-                if(produceCombat(barrack, _utt.getUnitType("Light")))
+                if(produceCombat(barrack, _utt.getUnitType("Ranged")))
                     continue;
             
-            if (_resources.isEmpty() && _p.getResources() - _resourcesUsed < _utt.getUnitType("Light").cost)
-                produceCombat(barrack, _utt.getUnitType("Light"));
+            if (_resources.isEmpty() && _p.getResources() - _resourcesUsed < _utt.getUnitType("Ranged").cost)
+                produceCombat(barrack, _utt.getUnitType("Ranged"));
         }
     }
     
@@ -847,7 +845,7 @@ public class OurAI extends AIWithComputationBudget {
             return false;
         Unit exUnit = _pgs.getUnitAt(p.getX(), p.getY());
         if (exUnit != null && (exUnit.getType() == _utt.getUnitType("Base")
-                || exUnit.getType() == _utt.getUnitType("Barracks"))) //todo - may be if mobile unit too?
+                || exUnit.getType() == _utt.getUnitType("Barracks"))) 
             return false; 
         return true;
     }
@@ -867,7 +865,7 @@ public class OurAI extends AIWithComputationBudget {
         if(worker == null || busy(worker))
             return;
         
-        for (int dir : _dirs) { //todo get best dir
+        for (int dir : _dirs) { 
             Pos p = futurePos(worker.getX(), worker.getY(), dir);
             if (validForFutureBuild(p) && 
                     produce(worker, dir, _utt.getUnitType("Base")))
@@ -899,7 +897,7 @@ public class OurAI extends AIWithComputationBudget {
         if (edist < dangerTLen) {
             dangerPenalty = (2*dangerTLen) / edist;
             if (between(toPos(w), dst, toPos(e)))
-                dangerPenalty -= 3; //building site is blocking the enemy
+                dangerPenalty -= 3; 
         }
         int wDist = distance(toPos(w), dst) / 2;
         return - dangerPenalty - wDist;
@@ -935,13 +933,13 @@ public class OurAI extends AIWithComputationBudget {
         allBrxs.addAll(_futureBarracks);
         int deseretScore = 0;
         if (!allBrxs.isEmpty())
-            deseretScore = (int) (minDistance(toPos(b), allBrxs) / 2); //like base to be deserted
+            deseretScore = (int) (minDistance(toPos(b), allBrxs) / 2);
         
         double blockingPenalty = buildBlockPenalty(dst, false);
 
         Unit worker = _workers.stream().max(Comparator.
                 comparingInt((u) -> buildBarrackWorkerScore(dst, u))).get();
-        int workerScore = buildBarrackWorkerScore(dst, worker); //include danger
+        int workerScore = buildBarrackWorkerScore(dst, worker); 
         
         
         return 10*(deseretScore - (int)blockingPenalty + workerScore);
@@ -954,7 +952,7 @@ public class OurAI extends AIWithComputationBudget {
         return produce(worker, dir,  _utt.getUnitType("Barracks"));
     }
     boolean needNewBarracks() {
-        if (_barracks.size() + _futureBarracks.size() >= _bases.size()) //todo
+        if (_barracks.size() + _futureBarracks.size() >= _bases.size()) 
             return false;
         
         int maxDist = _pgs.getWidth() / 4;
@@ -976,7 +974,7 @@ public class OurAI extends AIWithComputationBudget {
         if (!needNewBarracks())
             return;
         
-        if(_bases.isEmpty()) //todo
+        if(_bases.isEmpty()) 
             return;
         
         if (_workers.isEmpty())
@@ -989,7 +987,7 @@ public class OurAI extends AIWithComputationBudget {
         }
         
         int counter = 0; 
-        while (!pCandidates.isEmpty() && counter < 2) {//sometimes better to wait to next round...
+        while (!pCandidates.isEmpty() && counter < 2) {
             Pos c = pCandidates.stream().max(Comparator.comparingInt((e) -> buildBarrackScore(e))).get();
             if (buildBarrackScore(c) == Integer.MIN_VALUE)
                 break;
@@ -1009,23 +1007,18 @@ public class OurAI extends AIWithComputationBudget {
         
         if (squareDist(toPos(attacker), toPos(defender))
                 > (_utt.getUnitType("Ranged").attackRange + 3))
-            return Integer.MIN_VALUE; //tood - remove
+            return Integer.MIN_VALUE; 
         
-        //int rangerBasePenalty = 0;
-        //if (attacker.getType() == _utt.getUnitType("Ranger")
-         //       && attacker.getType() == _utt.getUnitType("Base")) 
-         //   rangerBasePenalty = 1;
         
         boolean inRange = inAttackRange(attacker, defender);
         int attackSucc = inRange && !willEscapeAttack(attacker, defender) ? 1 : 0;
         int threatened = inAttackRange(defender, attacker) ? 1 : 0;
         int willKill = attacker.getMaxDamage() > defender.getHitPoints() ? 1 : 0;
         
-        int enemyPower = defender.getMaxDamage(); //defender.getMaxHitPoints();
+        int enemyPower = defender.getMaxDamage(); 
         
-        int archerToWorker = (attacker.getType() == _utt.getUnitType("Ranged") && //todo big change this was Ranger instead of Ranged
-                defender.getType() == _utt.getUnitType("Worker")) ? 1 : 0;  //to do this was 1: 0 
-        
+        int archerToWorker = (attacker.getType() == _utt.getUnitType("Ranged") && 
+                defender.getType() == _utt.getUnitType("Worker")) ? 1 : 0;  
         return 1000*attackSucc + 100 * willKill + (archerToWorker + enemyPower) * 10 + threatened;
     }
     boolean attackNearby(Unit u, Unit e) {
@@ -1034,20 +1027,20 @@ public class OurAI extends AIWithComputationBudget {
         if (attackSucc) {
             return attackNow(u, e);
         }
-        else if(soonInAttackRange(u, e)) { //wait for attack
+        else if(soonInAttackRange(u, e)) { 
             doNothing(u);
             return true;
         }
         boolean threatened = inAttackRange(e, u);
         if(threatened) {
-            return moveTowards(u, toPos(e)); //running to rangers... may be shouldnt?
+            return moveTowards(u, toPos(e)); 
         }
         return false;
     }
     void attackNearby(Unit u) {
         List<Unit> candidates = new ArrayList<>(_enemies);
         
-        int cutOff = _enemiesCombat.size() > 24 ? 12 : 24; //for performance issue
+        int cutOff = _enemiesCombat.size() > 24 ? 12 : 24; 
         int counter = 0;
         while (!candidates.isEmpty() && counter < cutOff) {
             Unit c = candidates.stream().max(Comparator.comparingInt((e) -> combatNearbyScore(u, e))).get();
@@ -1069,7 +1062,7 @@ public class OurAI extends AIWithComputationBudget {
         _startCycleMilli = 0;
         _latestTsMilli = 0;
         
-        //kinda random, do not want to take time unnecessarily
+        
         if (_pgs.getWidth() < 24 || _pgs.getUnits().size() < 24)
             return;
         
@@ -1171,7 +1164,7 @@ public class OurAI extends AIWithComputationBudget {
         _futureBarracks = new ArrayList<>();
         _futureHeavies = 0;
         _enemyFutureHeavy = 0;
-        for (Unit u : _all) { //todo big change that was ally by mistake
+        for (Unit u : _all) { 
             UnitActionAssignment aa = _gs.getActionAssignment(u);
             if(aa == null)
                 continue;
@@ -1186,8 +1179,7 @@ public class OurAI extends AIWithComputationBudget {
                  _resourcesUsed += aa.action.getUnitType().cost; 
             
              if (!isEnemyUnit(u) && ut == _utt.getUnitType("Barracks")) {
-                 Pos p = futurePos(u.getX(), u.getY(), aa.action.getDirection()); //todo this was aa.action.x which was 0 big change
-                 _futureBarracks.add(p);
+                 Pos p = futurePos(u.getX(), u.getY(), aa.action.getDirection()); 
              }
              if (!isEnemyUnit(u) && ut == _utt.getUnitType("Heavy")) {
                  _futureHeavies += 1;
@@ -1207,7 +1199,7 @@ public class OurAI extends AIWithComputationBudget {
                 continue;
             if (!_newDmgs.containsKey(t))
                 _newDmgs.put(t, 0);
-            // todo - not assuming its going to hit
+           
             int newDmg = _newDmgs.get(t) + u.getMaxDamage();
             _newDmgs.replace(t, newDmg);
         }
@@ -1253,7 +1245,7 @@ public class OurAI extends AIWithComputationBudget {
         
         init();
         
-        attackNearby(); //fight whoever is near
+        attackNearby(); 
         
         
         buildBracks();
@@ -1272,7 +1264,7 @@ public class OurAI extends AIWithComputationBudget {
         goCombat(_archers, 15);
         goCombat(_lights, 5);
         
-        //if (_pgs.getWidth() >= 9)
+
             
         
         
